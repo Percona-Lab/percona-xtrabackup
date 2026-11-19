@@ -243,6 +243,8 @@ install_deps() {
             yum-config-manager --enable ol9_distro_builder
             yum-config-manager --enable ol9_codeready_builder
             yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+            dnf install -y oracle-epel-release-el9
+            dnf config-manager --set-enabled ol9_codeready_builder
         else
             add_percona_yum_repo
         fi
