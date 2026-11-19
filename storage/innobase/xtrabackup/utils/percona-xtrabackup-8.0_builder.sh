@@ -323,7 +323,11 @@ install_deps() {
         PKGLIST+=" cmake debhelper libaio-dev libncurses-dev libtool libz-dev libsasl2-dev"
         PKGLIST+=" libgcrypt-dev libev-dev lsb-release libudev-dev"
         PKGLIST+=" build-essential rsync libdbd-mysql-perl libnuma1 socat libssl-dev patchelf libicu-dev"
-        PKGLIST+=" libprocps-dev"
+        PKGLIST+=" libprocps-dev vim-common"
+        # xxd is shipped in vim-common up to focal/bullseye, and as a separate package on newer releases
+        if apt-cache show xxd >/dev/null 2>&1; then
+            PKGLIST+=" xxd"
+        fi
 
         if [ "${OS_NAME}" == "bionic" ]; then
             PKGLIST+=" gcc-8 g++-8"
