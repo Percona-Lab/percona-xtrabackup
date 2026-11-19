@@ -323,7 +323,7 @@ install_deps() {
         if [ "${OS_NAME}" == "focal" -o "${OS_NAME}" == "bullseye" -o "${OS_NAME}" == "jammy" ]; then
             PKGLIST+=" python3-sphinx python3-docutils"
         else
-            PKGLIST+="sphinx-doc sphinx-common python-docutils"
+            PKGLIST+=" sphinx-doc sphinx-common python-docutils"
         fi
 
         until DEBIAN_FRONTEND=noninteractive apt-get -y install ${PKGLIST}; do
