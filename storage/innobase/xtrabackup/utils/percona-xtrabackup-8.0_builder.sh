@@ -173,6 +173,9 @@ get_sources(){
     # create a PXB tar
     cd ${WORKDIR}/percona-xtrabackup
     tar --owner=0 --group=0 --exclude=.bzr --exclude=.git -czf ${PXBDIR}.tar.gz ${PXBDIR}
+    PRODUCT="Percona-XtraBackup-8.0"
+    PRODUCT_FULL="Percona-XtraBackup-${XB_VERSION_MAJOR}.${XB_VERSION_MINOR}.${XB_VERSION_PATCH}${XB_VERSION_EXTRA}"
+    echo "UPLOAD=UPLOAD/experimental/BUILDS/${PRODUCT}/${PRODUCT_FULL}/${BRANCH}/${REVISION}/${BUILD_ID}" >> ../percona-xtrabackup-8.0.properties
     rm -rf ${PXBDIR}
 
     mkdir $WORKDIR/source_tarball
