@@ -194,7 +194,12 @@ get_system(){
     else
         GLIBC_VER_TMP="$(dpkg-query -W -f='${Version}' libc6 | awk -F'-' '{print $1}')"
         export ARCH=$(uname -m)
-        export OS_NAME="$(lsb_release -sc)"
+        if [ -f /etc/os-release ]; then
+            export OS_NAME="$(. /etc/os-release && echo ${VERSION_CODENAME})"
+        fi
+        if [ -z "${OS_NAME}" ] && command -v lsb_release >/dev/null 2>&1; then
+            export OS_NAME="$(lsb_release -sc)"
+        fi
         export OS="deb"
     fi
     export GLIBC_VER=".glibc${GLIBC_VER_TMP}"
@@ -306,8 +311,11 @@ install_deps() {
         fi
     else
         apt-get update
-        DEBIAN_FRONTEND=noninteractive apt-get -y install lsb-release gnupg git wget
-        wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb && dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb
+        DEBIAN_FRONTEND=noninteractive apt-get -y install lsb-release gnupg git wget curl
+        export OS_NAME="$(lsb_release -sc)"
+        wget https://repo.percona.com/apt/percona-release_latest.${OS_NAME}_all.deb
+        DEBIAN_FRONTEND=noninteractive apt-get -y install ./percona-release_latest.${OS_NAME}_all.deb
+        rm -f percona-release_latest.${OS_NAME}_all.deb
         percona-release enable tools testing
         apt-get update
 
