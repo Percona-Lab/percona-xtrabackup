@@ -260,11 +260,10 @@ install_deps() {
                 yum-config-manager --enable powertools
                 yum-config-manager --enable ol8_codeready_builder
                 if [ x"$ARCH" != "xx86_64" ]; then
-                    PKGLIST+=" python3-sphinx"
+                    PKGLIST+=" rsync python3-sphinx libarchive procps-ng-devel"
+                else
+                    PKGLIST+=" libarchive procps-ng-devel"
                 fi
-                wget https://jenkins.percona.com/downloads/rpm/procps-ng-devel-3.3.15-6.el8.x86_64.rpm
-                yum -y install ./procps-ng-devel-3.3.15-6.el8.x86_64.rpm
-                rm procps-ng-devel-3.3.15-6.el8.x86_64.rpm
             fi
             until yum -y install ${PKGLIST}; do
                 echo "waiting"
