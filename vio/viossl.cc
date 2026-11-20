@@ -129,7 +129,11 @@ static void report_errors(SSL *ssl) {
 
   DBUG_TRACE;
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  while ((l = ERR_get_error_all(&file, &line, nullptr, &data, &flags))) {
+#else  /* OPENSSL_VERSION_NUMBER >= 0x30000000L */
   while ((l = ERR_get_error_line_data(&file, &line, &data, &flags))) {
+#endif /* OPENSSL_VERSION_NUMBER >= 0x30000000L */
     DBUG_PRINT("error", ("OpenSSL: %s:%s:%d:%s\n", ERR_error_string(l, buf),
                          file, line, (flags & ERR_TXT_STRING) ? data : ""));
   }
@@ -274,7 +278,7 @@ size_t vio_ssl_read(Vio *vio, uchar *buf, size_t size) {
 
     ret = SSL_read(ssl, buf, (int)size);
 
-    if (ret >= 0) break;
+    if (ret > 0) break;
 
     /* Process the SSL I/O error. */
     if (!ssl_should_retry(vio, ret, &event, &ssl_errno_not_used)) break;
@@ -316,7 +320,7 @@ size_t vio_ssl_write(Vio *vio, const uchar *buf, size_t size) {
 
     ret = SSL_write(ssl, buf, (int)size);
 
-    if (ret >= 0) break;
+    if (ret > 0) break;
 
     /* Process the SSL I/O error. */
     if (!ssl_should_retry(vio, ret, &event, &ssl_errno_not_used)) break;
@@ -369,6 +373,12 @@ int vio_ssl_shutdown(Vio *vio) {
       default: /* Shutdown failed */
         DBUG_PRINT("vio_error",
                    ("SSL_shutdown() failed, error: %d", SSL_get_error(ssl, r)));
+#ifndef NDEBUG /* Debug build */
+        /* Note: the OpenSSL error queue gets cleared in report_errors(). */
+        report_errors(ssl);
+#else /* Release build */
+        ERR_clear_error();
+#endif
         break;
     }
   }
